@@ -36,6 +36,12 @@ b = 1.5;%Span in meter
 Aw = b*cw;
 As_free = Aw - 2*As_P;
 Tau_Ele = 0.45;
+e=0.9;
+AR=b^2/(Aw);
+K=1/(pi*e*AR);
+CD_0=0.0025;
+CL_0=0.04;
+Inc=0; %rad
 
 Xac = 0.25;
 Xcg = 0;
