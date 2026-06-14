@@ -44,7 +44,7 @@ CL_0=0.04;
 Inc=0; %rad
 
 Xac = 0.25;
-Xcg = 0;
+Xcg = 0.2;
 
 tau_act = 1/4;%actuator "delay" 
 
@@ -62,5 +62,38 @@ T0 = m*g; %thrust required at theta=pi/2 to keep the UAV from accelrating
 delta_0 = 0;
 
 
+%% Horizontal Flight Trim Calculation
+%  Define target flight condition
+V_cruise = 18.5; % Desired cruise speed in m/s (Adjust as needed)
+q_bar = 0.5 * Rho * V_cruise^2; % Dynamic pressure
 
+
+M_lift = m * g * (Xcg - Xac); 
+delta_trim = -M_lift / (q_bar * Aw * cw * Cm_delta);
+
+% 3. Calculate Trim Angle of Attack (alpha_trim)
+% L = q_bar * Aw * Cl_trim = m * g
+CL_req = (m * g) / (q_bar * Aw);
+
+% CL_trim = Clw_alpha * (alpha_trim + Tau_Ele * delta_trim)
+alpha_trim = (CL_req / Clw_alpha) - (Tau_Ele * delta_trim);
+
+% 4. Calculate Trim Thrust (Thrust_trim)
+% Thrust must equal aerodynamic Drag. 
+% Note: Adding basic Drag assumptions since they are missing from the init vars.
+Cd0 = 0.02; % Estimated parasitic drag coefficient (Update with your actual value)
+e = 0.8;    % Oswald efficiency factor
+AR = b^2 / Aw; % Aspect ratio
+K = 1 / (pi * e * AR); % Induced drag factor
+
+Cd_trim = Cd0 + K * CL_req^2; % Total drag coefficient
+Drag = q_bar * Aw * Cd_trim;
+Thrust_trim = Drag;
+
+% 5. Display the calculated trim values in the Command Window
+fprintf('\n--- Horizontal Trim Conditions at V = %.1f m/s ---\n', V_cruise);
+fprintf('Trim Angle of Attack (alpha) : %.4f rad  (%.2f deg)\n', alpha_trim, rad2deg(alpha_trim));
+fprintf('Trim Elevator (delta)        : %.4f rad  (%.2f deg)\n', delta_trim, rad2deg(delta_trim));
+fprintf('Trim Thrust Required         : %.2f N\n', Thrust_trim);
+fprintf('--------------------------------------------------\n');
 
